@@ -104,7 +104,7 @@ class ADMIN
 
         $this->send_email($email, $message, $subject, $this->smtp_email, $this->smtp_password);
         echo "<script>alert('We sent the OTP to $email'); window.location.href = '../../../verify-otp.php';</script>";
-            }
+        }
     }
 }
      
@@ -172,17 +172,27 @@ class ADMIN
                 <h1>Welcome</h1>
                 <p>Hello, <strong>$email</strong></p>
                 <p>Welcome to Siervo and Mangiliman System</p>
-                Email:<br /> $email <br />
                 <p>If you didn't sign up your account, you can safely ignore this email.</p>
                 <p>Thank You!</p>
                 </div>
         </body>
         </html>";
-        }
 
+        $this->send_email($email, $message, $subject, $this->smtp_email, $this->smtp_password);
+        echo "<script>alert('Thank You!'); window.location.href = '../../../';</script>";
+
+        unset($_SESSION['not_verify_username']);
+        unset($_SESSION['not_verify_email']);
+        unset($_SESSION['not_verify_password']);
+    }else if($otp == NULL){
+        echo "<script>alert('No OTP'); window.location.href = '../../../verify-otp.php';</script>";
+        exit;
+    }else{
+        echo "<script>alert('It appears that the OTP you entered is invalid'); window.location.href = '../../../verify-otp.php';</script>";
+        exit; 
     }
 
-
+}
 
     public function addAdmin($csrf_token, $username, $email, $password)
     {
