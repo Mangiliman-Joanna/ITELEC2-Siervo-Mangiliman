@@ -1,5 +1,4 @@
 <?php  
-
  require_once __DIR__.'/../../../database/dbconnection.php';
  include_once __DIR__.'/../../../config/settings-configuration.php';
  include_once __DIR__.'/../../../src/vendor/autoload.php';
@@ -180,7 +179,7 @@
                     </div>
                     <h1>Welcome</h1>
                     <p>Hello, <strong>$email</strong></p>
-                    <p>Welcome to Jhenny System</p>
+                    <p>Welcome to Joanna and Christine System</p>
                     <p>If you did not sign up for an account, you can safely ignore this email.</p>
                     <p>Thank you!</p>
                 </div>
