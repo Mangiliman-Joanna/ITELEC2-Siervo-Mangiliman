@@ -180,7 +180,6 @@ class ADMIN
 
         $this->send_email($email, $message, $subject, $this->smtp_email, $this->smtp_password);
         echo "<script>alert('Thank You!'); window.location.href = '../../../';</script>";
-
         unset($_SESSION['not_verify_username']);
         unset($_SESSION['not_verify_email']);
         unset($_SESSION['not_verify_password']);
@@ -238,24 +237,48 @@ class ADMIN
             }
             unset($_SESSION['csrf_token']);
 
-            $stmt = $this->runQuery("SELECT * FROM user WHERE email = :email");
-            $stmt->execute(array (":email" => $email));
+            $stmt = $this->conn->prepare("SELECT * FROM user WHERE email = :email AND status = :status");
+            $stmt->execute(array (":email" => $email, ":status => :active"));
             $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if($stmt->rowCount() == 1 && $userRow['password'] == md5($password)){
-                $activity = "Has Successfully Signed In";
-                $user_id = $userRow['id'];
-                $this->logs($activity, $user_id);
+            if($userRow->rowCount() == 1){
+                if($userRow['status' == "active"]){
+                    if($userRow['password'] == md5($password)){
+                    $activity = "Has Successfully Signed In";
+                    $user_id = $userRow['id'];
+                    $this->logs($activity, $user_id);
 
-            $_SESSION['adminSession'] = $user_id;
+                    $_SESSION['adminSession'] = $user_id;
 
-            echo "<script>alert('Welcome!'); window.location.href = '../';</script>";
-            exit;
-
+                    echo "<script>alert('Welcome!'); window.location.href = '../';</script>";
+                    exit;
+                    }else{
+                        echo "<script>alert('Password is incorrect'); window.location.href = '../../../';</script>";
+                        exit; 
+                    }
+                }else{
+                    echo "<script>alert('Entered Email is not verify'); window.location.href = '../../../';</script>";
+                    exit;
+                }
             }else{
-            echo "<script>alert('Invalid Credentials'); window.location.href = '../../../';</script>";
-            exit;
+                echo "<script>alert('No Account found'); window.location.href = '../../../';</script>";
+                exit;
             }
+
+            //if($stmt->rowCount() == 1 && $userRow['password'] == md5($password)){
+                //$activity = "Has Successfully Signed In";
+                //$user_id = $userRow['id'];
+                //$this->logs($activity, $user_id);
+
+            //$_SESSION['adminSession'] = $user_id;
+
+            //echo "<script>alert('Welcome!'); window.location.href = '../';</script>";
+            //exit;
+
+            //}else{
+            //echo "<script>alert('Invalid Credentials'); window.location.href = '../../../';</script>";
+            //exit;
+            //}
 
         }catch(PDOException $ex){
             echo $ex->getMessage();
@@ -291,7 +314,7 @@ class ADMIN
 
     public function logs($activity, $user_id)
     {
-        $stmt = $this->runQuery('INSERT INTO logs (activity, user_id) VALUES (:activity, :user_id)');
+        $stmt = $this->conn->prepare('INSERT INTO logs (activity, user_id) VALUES (:activity, :user_id)');
         $stmt->execute(array(":activity" => $activity, ":user_id" => $user_id));
     }
 
@@ -302,15 +325,14 @@ class ADMIN
         }
     }
 
-    public function redirect()
+    public function redirect($url)
     {
-        echo "<script>alert('Admin Must Log In First'); window.location.href = '../../../';</script>";
-        exit;
+        header ("Location: $url");
     }
 
     public function runQuery($sql)
     {
-        $stmt = $this->runQuery($sql);
+        $stmt = $this->conn->prepare($sql);
         return $stmt;
     }
 
