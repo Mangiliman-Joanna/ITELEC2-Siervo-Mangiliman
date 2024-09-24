@@ -238,7 +238,7 @@ class ADMIN
             unset($_SESSION['csrf_token']);
 
             $stmt = $this->conn->prepare("SELECT * FROM user WHERE email = :email AND status = :status");
-            $stmt->execute(array (":email" => $email, ":status => :active"));
+            $stmt->execute(array (":email" => $email, ":status" => "active"));
             $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if($userRow->rowCount() == 1){
