@@ -246,12 +246,12 @@
             unset($_SESSION['csrf_token']);
 
             $stmt = $this->runQuery("SELECT * FROM user WHERE email = :email AND status =:status");
-            $stmt->execute(array (":email" => $email, ":status"=> "active"));
+            $stmt->execute(array (":email" => $email, ":status" => "active"));
             $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if($userRow->rowCount() == 1){
-                if($userRow['status' == "active"]){
-                    if($userRow['password'] == md5($password)){
+                if($userRow->rowCount() == 1) {
+                  if($userRow['status' === "active"]){
+                    if($userRow['password'] === md5($password)){
                         $activity = "Has Successfully Signed In";
                         $user_id = $userRow['id'];
                         $this->logs($activity, $user_id);
@@ -265,28 +265,13 @@
                         exit;
                     }
                 }else{
-                    echo "<script>alert('Entered Email is not verify'); window.location.href = '../../../';</script>";
+                    echo "<script>alert('Entered Email is not verified'); window.location.href = '../../../';</script>";
                     exit;
                 }
             }else{
                 echo "<script>alert('No account found'); window.location.href = '../../../';</script>";
                     exit;
             }
-
-            // if($stmt->rowCount() == 1 && $userRow['password'] == md5($password)){
-            //     $activity = "Has Successfully Signed In";
-            //     $user_id = $userRow['id'];
-            //     $this->logs($activity, $user_id);
-
-            // $_SESSION['adminSession'] = $user_id;
-
-            // echo "<script>alert('Welcome!'); window.location.href = '../';</script>";
-            // exit;
-
-            // }else{
-            // echo "<script>alert('Invalid Credentials'); window.location.href = '../../../';</script>";
-            // exit;
-            // }
 
         }catch(PDOException $ex){
             echo $ex->getMessage();
@@ -304,10 +289,10 @@
     function send_email($email, $message, $subject, $smtp_email, $smtp_password){
         $mail = new PHPMailer();
         $mail->isSMTP();
-        $mail->SMTPDebug = 0;
+        $mail->SMTPDebug = 0; 
         $mail->SMTPAuth = true;
         $mail->SMTPSecure = "tls";
-        $mail->Host ="smtp.gmail.com";
+        $mail->Host = "smtp.gmail.com";
         $mail->Port = 587;
         $mail->addAddress($email);
         $mail->Username = $smtp_email;
@@ -317,6 +302,7 @@
         $mail->msgHTML($message);
         $mail->Send();
     }
+    
 
     public function logs($activity, $user_id)
     {
