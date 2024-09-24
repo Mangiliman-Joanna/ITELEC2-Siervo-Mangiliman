@@ -245,8 +245,8 @@ class ADMIN
             }
             unset($_SESSION['csrf_token']);
 
-            $stmt = $this->conn->prepare("SELECT * FROM user WHERE email = :email AND status =:status");
-            $stmt->execute(array (":email" => $email, ":status"=> "active"));
+            $stmt = $this->runQuery("SELECT * FROM user WHERE email = :email AND status = :status");
+            $stmt->execute(array (":email" => $email, ":status" => "active"));
             $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if($userRow->rowCount() == 1){
@@ -320,7 +320,7 @@ class ADMIN
 
     public function logs($activity, $user_id)
     {
-        $stmt = $this->conn->prepare('INSERT INTO logs (activity, user_id) VALUES (:activity, :user_id)');
+        $stmt = $this->runQuery('INSERT INTO logs (activity, user_id) VALUES (:activity, :user_id)');
         $stmt->execute(array(":activity" => $activity, ":user_id" => $user_id));
     }
 
