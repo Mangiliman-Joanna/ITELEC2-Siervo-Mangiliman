@@ -117,8 +117,6 @@ class ADMIN
         if ($otp == $_SESSION['OTP']) {
             unset($_SESSION['OTP']);
 
-            $this->addAdmin($csrf_token, $username, $email, $password);
-
             $subject = "VERIFICATION SUCCESS";
             $message = "
             <!DOCTYPE html>
@@ -182,7 +180,9 @@ class ADMIN
             unset($_SESSION['not_verify_username']);
             unset($_SESSION['not_verify_email']);
             unset($_SESSION['not_verify_password']);
-            
+
+            $this->addAdmin($csrf_token, $username, $email, $password);
+
         } else if ($otp == NULL) {
             echo "<script>alert('No OTP Found'); window.location.href = '../../../verify-otp.php';</script>";
             exit;
