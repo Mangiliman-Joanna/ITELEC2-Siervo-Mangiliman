@@ -1,21 +1,20 @@
 <?php
 session_start();
-include_once __DIR__ .'/../database/dbconnection.php';
+include_once __DIR__.'/../database/dbconnection.php';
 
-//error reporting
+// error reporting
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-//csrf token
+//CSRF TOKEN
 if(empty($_SESSION['csrf_token'])){
     $csrf_token = bin2hex(random_bytes(32));
-    $_SESSION['csrf_token'] = $csrf_token;
+    $_SESSION['csrf_token'] = $csrf_token; 
 }
 else{
     $csrf_token = $_SESSION['csrf_token'];
 }
-
 
 class SystemConfig{
 
@@ -36,7 +35,6 @@ class SystemConfig{
 
         $this->smtp_email = $email_config['email'];
         $this->smtp_password = $email_config['password'];
-
     }
 
     public function getSmtpEmail(){
@@ -52,4 +50,5 @@ class SystemConfig{
         return $stmt;
     }
 }
+
 ?>
