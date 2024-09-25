@@ -250,8 +250,8 @@
             $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if($userRow->rowCount() == 1) {
-                  if($userRow['status' === "active"]){
-                    if($userRow['password'] === md5($password)){
+                  if($userRow['status' == "active"]){
+                    if($userRow['password'] == md5($password)){
                         $activity = "Has Successfully Signed In";
                         $user_id = $userRow['id'];
                         $this->logs($activity, $user_id);
