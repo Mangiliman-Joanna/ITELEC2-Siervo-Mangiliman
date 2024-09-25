@@ -1,12 +1,12 @@
-<?php  
- require_once __DIR__.'/../../../database/dbconnection.php';
- include_once __DIR__.'/../../../config/settings-configuration.php';
- include_once __DIR__.'/../../../src/vendor/autoload.php';
- use PHPMailer\PHPMailer\PHPMailer;
- use PHPMailer\PHPMailer\SMTP;
- use PHPMailer\PHPMailer\Exception;
+<?php 
+require_once __DIR__.'/../../../database/dbconnection.php';
+require_once __DIR__.'/../../../config/settings-configuration.php';
+require_once __DIR__.'/../../../src/vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
- class ADMIN 
+class ADMIN 
 {
     private $conn; 
     private $settings;
@@ -112,8 +112,9 @@
         }
     }
 
-    public function verifyOTP($username, $email, $password, $tokencode, $otp, $csrf_token){
-        if($otp == $_SESSION['OTP']){
+    public function verifyOTP($username, $email, $password, $tokencode, $otp, $csrf_token)
+    {
+        if ($otp == $_SESSION['OTP']) {
             unset($_SESSION['OTP']);
 
             $this->addAdmin($csrf_token, $username, $email, $password);
@@ -132,7 +133,7 @@
                         margin: 0;
                         padding: 0;
                     }
-
+    
                     .container {
                         max-width: 600px;
                         margin: 0 auto;
@@ -141,33 +142,22 @@
                         border-radius: 4px;
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                     }
-
-                    h1{
+    
+                    h1 {
                         color:#333333;
                         font-size: 24px;
                         margin-bottom: 20px;
                     }
-
+    
                     p {
                         color: #666666;
                         font-size: 16px;
                         margin-bottom: 10px;
                     }
-
-                    .button {
-                        display: inline-block;
-                        padding: 12px 24px;
-                        background-color: #0088cc;
-                        color: #ffffff;
-                        text-decoration: none;
-                        border-radius: 4px;
-                        font-size: 16px;
-                        margin-top: 20px;
-                    }
-
+    
                     .logo {
                         display: block;
-                        text-align:  center;
+                        text-align: center;
                         margin-bottom: 30px;
                     }
                 </style>
@@ -175,11 +165,11 @@
             <body>
                 <div class='container'>
                     <div class='logo'>
-                    <img src='cid:logo' alt='Logo' width='150'>
+                        <img src='cid:logo' alt='Logo' width='150'>
                     </div>
                     <h1>Welcome</h1>
                     <p>Hello, <strong>$email</strong></p>
-                    <p>Welcome to Joanna and Christine System</p>
+                    <p>Welcome to Joanna System</p>
                     <p>If you did not sign up for an account, you can safely ignore this email.</p>
                     <p>Thank you!</p>
                 </div>
@@ -187,16 +177,17 @@
             </html>";
 
             $this->send_email($email, $message, $subject, $this->smtp_email, $this->smtp_password);
-            echo "<script>alert('Thank You'); window.location.href = '../../../';</script>";
+            echo "<script>alert('Verification successful! Thank you for verifying your email.'); window.location.href = '../../../';</script>";
 
             unset($_SESSION['not_verify_username']);
             unset($_SESSION['not_verify_email']);
             unset($_SESSION['not_verify_password']);
-        }else if($otp == NULL){
+            
+        } else if ($otp == NULL) {
             echo "<script>alert('No OTP Found'); window.location.href = '../../../verify-otp.php';</script>";
             exit;
-        } else{
-            echo "<script>alert('It appears that the OTP you entered is invalid'); window.location.href = '../../../verify-otp.php';</script>";
+        } else {
+            echo "<script>alert('It appears that the OTP you entered is invalid'); window.location.href = '../../../../verify-otp.php';</script>";
             exit;
         }
     }
@@ -228,7 +219,7 @@
         ));
 
         if($exec){
-            echo "<script>alert('Admin Added Successfully.'); window.location.href = '../../../';</script>";
+            echo "<script>alert('Admin Added Successfully.'); window.location.href = '../../../../';</script>";
             exit; 
         }else{
             echo "<script>alert('Error Adding Admin.'); window.location.href = '../../../';</script>";
@@ -238,20 +229,22 @@
     
     public function adminSignin($email, $password, $csrf_token)
     {
-        try{
-            if(!isset($csrf_token) || !hash_equals($_SESSION['csrf_token'], $csrf_token)){
+        try {
+            if (!isset($csrf_token) || !hash_equals($_SESSION['csrf_token'], $csrf_token)) {
                 echo "<script>alert('INVALID CSRF Token.'); window.location.href = '../../../';</script>";
                 exit;
             }
             unset($_SESSION['csrf_token']);
 
-            $stmt = $this->runQuery("SELECT * FROM user WHERE email = :email AND status =:status");
-            $stmt->execute(array (":email" => $email, ":status" => "active"));
-            $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $this->runQuery("SELECT * FROM user WHERE email = :email AND status = :status");
+            $stmt->execute(array(":email" => $email, ":status" => "active"));
 
-                if($userRow->rowCount() == 1) {
-                  if($userRow['status' == "active"]){
-                    if($userRow['password'] == md5($password)){
+            if ($stmt->rowCount() == 1) {
+                $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($userRow['status'] === "active") {
+                    if ($userRow['password'] === md5($password)) {
+
                         $activity = "Has Successfully Signed In";
                         $user_id = $userRow['id'];
                         $this->logs($activity, $user_id);
@@ -260,17 +253,17 @@
 
                         echo "<script>alert('Welcome!'); window.location.href = '../';</script>";
                         exit;
-                    }else{
+                    } else {
                         echo "<script>alert('Password is incorrect'); window.location.href = '../../../';</script>";
                         exit;
                     }
-                }else{
+                } else {
                     echo "<script>alert('Entered Email is not verified'); window.location.href = '../../../';</script>";
                     exit;
                 }
-            }else{
+            } else {
                 echo "<script>alert('No account found'); window.location.href = '../../../';</script>";
-                    exit;
+                exit;
             }
 
         }catch(PDOException $ex){
@@ -289,10 +282,10 @@
     function send_email($email, $message, $subject, $smtp_email, $smtp_password){
         $mail = new PHPMailer();
         $mail->isSMTP();
-        $mail->SMTPDebug = 0; 
+        $mail->SMTPDebug = 0;
         $mail->SMTPAuth = true;
         $mail->SMTPSecure = "tls";
-        $mail->Host = "smtp.gmail.com";
+        $mail->Host ="smtp.gmail.com";
         $mail->Port = 587;
         $mail->addAddress($email);
         $mail->Username = $smtp_email;
@@ -302,7 +295,6 @@
         $mail->msgHTML($message);
         $mail->Send();
     }
-    
 
     public function logs($activity, $user_id)
     {
@@ -327,6 +319,7 @@
         $stmt = $this->conn->prepare($sql);
         return $stmt;
     }
+    
 }
 
 if(isset ($_POST['btn-signup'])){
